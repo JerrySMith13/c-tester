@@ -1,0 +1,4 @@
+- tests root dir
+- postfix for detecting tests
+- compiler path & options
+- time-to-live for tests
