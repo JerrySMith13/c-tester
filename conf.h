@@ -1,10 +1,16 @@
+#ifndef CONF_H
+#define CONF_H
+
+// ALL PATHS SHOULD END W/O A SLASH (/).
+
 typedef struct Conf{
   char* tests_root;
   char* testfile_postfix;
-  char* comp_path;
-  char* comp_options;
+  char* comp_path; //Guaranteed to be a valid executable 
+  char** comp_args; 
+  int comp_argc;
   unsigned int max_time;
-} ConfObject;
+} Conf;
 
 enum ConfRes{
 
@@ -12,4 +18,6 @@ enum ConfRes{
     Ok = 0,
 };
 
-ConfRes read_conf(const char* path, Conf* conf);
+enum ConfRes read_conf(const char* path, Conf* conf);
+
+#endif
