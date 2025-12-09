@@ -1,4 +1,10 @@
 root_path = ./
+     
+
 suffix = .test
+
+     
 compiler = /usr/bin/gcc
-max_runtime = 13
+
+
+max_runtime =30522

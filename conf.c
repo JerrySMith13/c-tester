@@ -53,17 +53,27 @@ enum ConfRes read_conf(const char* path, Conf* conf){
     size_t line_cnt = 1;
 
     for(int i = 0; i < sizestat.st_size; i++){
-        if(file[i] == '\n' || i == sizestat.st_size - 1){
+        if(file[i] == '\n'){
+            if(line_len == 0){
+                continue;
+            }
             if (proc_line(file + (i - line_len), line_len, conf) < 0){
                 printf("Error processing line %zu", line_cnt);
                 free(file);
                 return ParsErr;
             }
             line_len = 0;
+            continue;
         }
         line_len++;
     }
-
+    if (line_len) { // leftover line w/out newline
+        if (proc_line(file + (sizestat.st_size - line_len), line_len, conf) < 0){
+            printf("Error processing line %zu", line_cnt);
+            free(file);
+            return ParsErr;
+        }
+    }
 
     free(file);
     return Ok;
@@ -94,26 +104,30 @@ int proc_line(char* line, size_t len, Conf* conf){
         arg[argsize] = line[i];
         argsize++;
     }
+    if (argsize == 0){
+        return Ok;
+    }
     if (val_offset == -1) {
         return ParsErr; //Error handling needed
     }
-    if ((val = malloc(len - argsize + 1)) == NULL){
+    while (val_offset < len && line[val_offset] == ' ') val_offset++;
+    size_t val_len = (val_offset < len) ? (len - val_offset) : 0;
+    if ((val = malloc(val_len + 1)) == NULL) {
         return AllocErr;
     };
-    memcpy(val, line + val_offset, len - argsize - 1);
-    val[len - argsize] = '\0';
+    memcpy(val, line + val_offset, val_len);
+    val[val_len] = '\0';
+
 
     if (strcmp(arg, "root_path") == 0){
         conf->tests_root = realpath(val, NULL);
         free(val);
-        printf("root: %s\n", val);
         if (conf->tests_root == NULL){
-            perror("Error was: ");
             return AllocErr;
         }
     }
     else if(strcmp(arg, "suffix") == 0){
-        conf->tests_root = val;
+        conf->testfile_postfix = val;
     }
     else if(strcmp(arg, "compiler") == 0){
         conf->comp_path = realpath(val, NULL);
@@ -124,7 +138,7 @@ int proc_line(char* line, size_t len, Conf* conf){
         }
     }
     else if(strcmp(arg, "max_runtime") == 0){
-        conf->max_time = strtol(val, NULL, 0);
+        conf->max_time = strtoul(val, NULL, 10);
         free(val);
         if (errno == EINVAL){
             printf("Error reading max_runtime in conf file!");

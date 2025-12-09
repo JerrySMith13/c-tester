@@ -11,7 +11,7 @@ typedef struct Conf{
   char* comp_path; //Free
   char** comp_args; 
   int comp_argc;
-  unsigned int max_time;
+  unsigned long max_time;
 } Conf;
 
 enum ConfRes{
