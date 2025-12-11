@@ -38,7 +38,7 @@ enum ConfRes read_conf(const char* path, Conf* conf){
     }
 
     if((file = malloc(sizestat.st_size)) == NULL){
-        printf("Error allocating memory to read file");
+        printf("Error allocating memory to read file\n");
         return FileErr;
     }
 
@@ -58,7 +58,7 @@ enum ConfRes read_conf(const char* path, Conf* conf){
                 continue;
             }
             if (proc_line(file + (i - line_len), line_len, conf) < 0){
-                printf("Error processing line %zu", line_cnt);
+                printf("Error processing line %zu\n", line_cnt);
                 free(file);
                 return ParsErr;
             }
@@ -69,7 +69,7 @@ enum ConfRes read_conf(const char* path, Conf* conf){
     }
     if (line_len) { // leftover line w/out newline
         if (proc_line(file + (sizestat.st_size - line_len), line_len, conf) < 0){
-            printf("Error processing line %zu", line_cnt);
+            printf("Error processing line %zu\n", line_cnt);
             free(file);
             return ParsErr;
         }
@@ -97,7 +97,7 @@ int proc_line(char* line, size_t len, Conf* conf){
         //This indicates that the argument is too big
         else if(argsize > CONF_ARG_MAXSIZE){
             arg[CONF_ARG_MAXSIZE] = '\0';
-            printf("Error: argument not valid: %s", arg);
+            printf("Error: argument not valid: %s\n", arg);
             return ParsErr; //Error handling needed
         }
 
@@ -133,7 +133,7 @@ int proc_line(char* line, size_t len, Conf* conf){
         conf->comp_path = realpath(val, NULL);
         free(val);
         if (conf->comp_path == NULL){
-            printf("Error reading root_path in conf file");
+            printf("Error reading root_path in conf file\n");
             return AllocErr;
         }
     }
@@ -141,12 +141,12 @@ int proc_line(char* line, size_t len, Conf* conf){
         conf->max_time = strtoul(val, NULL, 10);
         free(val);
         if (errno == EINVAL){
-            printf("Error reading max_runtime in conf file!");
+            printf("Error reading max_runtime in conf file\n");
             return ParsErr;
         }
     }
     else {
-        printf("Error reading arg \"%s\": invalid argument", arg);
+        printf("Error reading arg \"%s\": invalid argument\n", arg);
         free(val);
         return ParsErr;
     }
