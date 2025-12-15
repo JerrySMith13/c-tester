@@ -1,25 +1,17 @@
-#include "exec.h"
-#include "conf.h"
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
+#include <dirent.h>
+#include <string.h>
 
-char* find_conf(){
-
-}
 
 int main(int nargs, char** args){
-    Conf conf;
-    if (nargs < 2){
+    DIR* dir = opendir(".");
 
+    for (struct dirent* entry = readdir(dir); entry != NULL; entry = readdir(dir)){
+        printf("%s\n", entry->d_name);
     }
-    else {
-        if(read_conf(args[1], &conf) != Ok){
-            printf("conf: error reading file");
-            return -1;
-        }
-    }
-
+    closedir(dir);
     
 
     return 0;
