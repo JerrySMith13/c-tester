@@ -2,8 +2,11 @@
 #define TESTFILE_H
 
 #include "exec.h"
+#include "conf.h"
+#include <string.h>
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <dirent.h>
 
 typedef struct TestList{
@@ -14,32 +17,13 @@ typedef struct TestList{
 } TestList;
 
 typedef enum ReadTestRes{
-
+    TestOk,
 } ReadTestRes;
 
-int init_list(TestList* list){
-    list->start = (Test*) malloc(sizeof(Test) * 10);
-    list->capacity = 10;
-    list->len = 0;
-    if (list->start == NULL){
-        return -1;
-    }
-    else return 0;
-}
+int init_list(TestList* list);
 
-int find_tests(const char* root_path){
-    DIR* dir = opendir(root_path);
-    dirent* entry;
-    if (dir == NULL){
-        return -1; //Error handling needed
-    }
-    while ((entry = readdir(dir)) != NULL){
-        if (entry->d_type )
-    };
-}
-
-bool is_test(const char* filename, const char* postfix){
-
-}
-
+int TestList_push(TestList* list, Test* to_push);
+int find_tests(const char* root_path);
+int search_dir(TestList* list_to_append, DIR* dir, Conf* config);
+bool is_test(const char* filename, const char* postfix);
 #endif

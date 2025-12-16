@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/wait.h>
 
 int exec_test(const Test* test, Result* surrogate){
   // Construct outfile name
@@ -52,7 +53,8 @@ int exec_test(const Test* test, Result* surrogate){
       _exit(127);
     case 0:
       printf("Compiling %s ...", test->filename);
-      int ret = execv(test->conf->comp_path, comp_args);
+      execv(test->conf->comp_path, comp_args);
+      // Only runs if error occurs
       perror("execv");
       free(of_path);
       free(if_path);
@@ -99,7 +101,8 @@ int exec_test(const Test* test, Result* surrogate){
       free(comp_args);
       _exit(127);
     case 0:
-      execv(of_path, NULL);
+    char* exec_n[2] = {of_path, NULL};
+      execv(of_path, exec_n);
     default: {
       pid_t pid;
       int status;
