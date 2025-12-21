@@ -37,6 +37,7 @@ static bool entry_is_directory(const char* parent, struct dirent* entry){
     if (stat_res < 0){
         return false;
     }
+    
     return S_ISDIR(st.st_mode);
 }
 
@@ -55,6 +56,7 @@ static bool entry_is_regfile(const char* parent, struct dirent* entry){
     if (stat_res < 0){
         return false;
     }
+
     return S_ISREG(st.st_mode);
 }
 
@@ -80,27 +82,37 @@ int init_list(TestList* list){
 int TestList_push(TestList* list, Test* to_push){
     if (list->len + 1 >= list->capacity){
         size_t new_cap = (int) ((double) list->capacity * 1.5);
-        list->start = (Test*) realloc(list->start, list->capacity);
+        list->start = (Test*) realloc(list->start, new_cap * sizeof(Test));
         if (list->start == NULL){
             return -1;
         }
         list->capacity = new_cap;
     }
     memcpy(list->start + list->len, to_push, sizeof(Test));
+    list->len++;
+    return 0;
+}
+
+int TestList_dealloc(TestList* list){
+    for(int i = 0; i < list->len; i++){
+        free_test(&list->start[i]);
+    }
+    free(list->start);
     return 0;
 }
 
 // On success, returns number of tests generated
 static int search_tests(TestList* to_add, DIR* dir, const Conf* config, const char* prefix){
-    struct dirent* entry = readdir(dir);
+    struct dirent* entry;
     DIR* found_dir;
     size_t added = 0;
     int numread = -1;
 
-    while (entry != NULL){
+    while ((entry = readdir(dir)) != NULL) {
         Test newtest;
         if (entry && entry_is_directory(prefix, entry)){
-            if ((found_dir = opendir(entry->d_name)) == NULL){
+            char* full_path = stitch_path(prefix, entry->d_name);
+            if ((found_dir = opendir(full_path)) == NULL){
                 printf("Error opening directory: %s\n", entry->d_name);
                 perror("Errno val: ");
                 closedir(found_dir);
@@ -116,10 +128,12 @@ static int search_tests(TestList* to_add, DIR* dir, const Conf* config, const ch
             if((numread = search_tests(to_add, found_dir, config, new_prefix)) < 0){
                 closedir(found_dir);
                 free(new_prefix);
+                free(full_path);
                 return -1;
             }
             added += numread;
             free(new_prefix);
+            free(full_path);
             closedir(found_dir);
         }
         else if(entry && entry_is_regfile(prefix, entry)){
@@ -136,8 +150,7 @@ static int search_tests(TestList* to_add, DIR* dir, const Conf* config, const ch
                 added++;
             }
         }
-        entry = readdir(dir);
-    }
+    } 
 
     return added;
 }
@@ -146,6 +159,7 @@ int find_tests(const char* root_path, TestList* to_push, const Conf* config){
     DIR* dir = opendir(root_path);
 
     int status = search_tests(to_push, dir, config, config->tests_root);
+    closedir(dir);
     return status;
     
 }

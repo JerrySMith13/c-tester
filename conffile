@@ -1,10 +1,6 @@
 root_path = ./tests
      
 
-suffix = .test
+suffix = .test.c
 
-     
 compiler = /usr/bin/gcc
-
-
-max_runtime =30522

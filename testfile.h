@@ -24,6 +24,8 @@ typedef enum ReadTestRes{
 
 int init_list(TestList* list);
 int TestList_push(TestList* list, Test* to_push);
+int TestList_dealloc(TestList* list);
+
 
 int find_tests(const char* root_path, TestList* to_push, const Conf* config);
 

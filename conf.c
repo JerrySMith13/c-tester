@@ -160,4 +160,5 @@ void free_conf(Conf* conf){
     free(conf->comp_path);
     free(conf->testfile_postfix);
     free(conf->tests_root);
+    free(conf->comp_args);
 }

@@ -3,21 +3,16 @@
 
 #include "conf.h"
 
-#define TEST_TEMP_EXT ".temp.test"
-#define TEST_EXT_LEN 11
+#define TEST_TEMP_EXT ".temp"
+#define TEST_EXT_LEN 6
 
 typedef struct Test{
 
-  const char* filename; // Includes postfix + any additional paths before it
+  char* filename; // Includes postfix + any additional paths before it
   const Conf* conf;
 
 } Test;
 
-typedef struct Result{
-  int status;
-  const char* test_out;
-  const char* test_name;
-} Result;
 
 /*
   Process for running a test
@@ -37,6 +32,8 @@ typedef struct Result{
     - First, we 
 */
 
-int exec_test(const Test* test, Result* surrogate);
+int exec_test(const Test* test, int* res_code);
+
+int free_test(Test* test);
 
 #endif
