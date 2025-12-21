@@ -10,25 +10,25 @@
 
 int main(int nargs, char** args){
     TestList new_list;
+    Conf conf;
 
-    if (init_list(&new_list) != 0){
-        printf("Error in init_list\n");
-        goto end;
+    if (init_list(&new_list) < 0){
+        perror("Malloc error: ");
+        return -1;
     }
 
-    Test new_test;
-    for(char i = 'a'; i < '9'; i++){
-        const char* name = {i, '\0'};
-        new_test.filename = name;
-        TestList_push(&new_list, &new_test);
+    if (read_conf("./conffile", &conf) != Ok){
+        return -1;
     }
+    int num_read = find_tests(conf.tests_root, &new_list, &conf);
 
-    for(int i = 0; i < new_list.len; i++){
-        printf(new_list.start[i].filename);
+    if (num_read < 0){
+        return -1;
     }
-    printf("\n%ld entries printed", new_list.len);
+    else {
+        return 0;
+    }
+    
 
-    end: 
-    perror("errno:");
-    return 0;
+    
 }

@@ -25,12 +25,6 @@ typedef enum ReadTestRes{
 int init_list(TestList* list);
 int TestList_push(TestList* list, Test* to_push);
 
-int find_tests(const char* root_path);
-char* stitch_path(const char* prefix, const char* name);
-int search_tests(TestList* to_add, DIR* dir, Conf* config, const char* prefix);
-bool is_test(const char* filename, const char* postfix);
+int find_tests(const char* root_path, TestList* to_push, const Conf* config);
 
-int TestList_push(TestList* list, Test* to_push);
-int find_tests(const char* root_path);
-int search_dir(TestList* list_to_append, DIR* dir, Conf* config);
 #endif

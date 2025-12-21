@@ -100,11 +100,12 @@ int exec_test(const Test* test, Result* surrogate){
       free(if_path);
       free(comp_args);
       _exit(127);
-    case 0:
-    char* exec_n[2] = {of_path, NULL};
+    case 0: {
+      char* exec_n[2] = {of_path, NULL};
       execv(of_path, exec_n);
+    }
     default: {
-      pid_t pid;
+      pid_t pid = 0;
       int status;
 
       do {
